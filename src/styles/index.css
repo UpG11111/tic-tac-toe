@@ -1,0 +1,50 @@
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    li {
+        list-style-type: none;
+    }
+
+    input {
+        height: 30px;
+        width: 80px;
+        margin-bottom: 30px;
+    }
+
+    .square {
+        display: inline-block;
+        width: 35px;
+        height: 35px;
+        background-color: #fff;
+        border: 1px solid black;
+        overflow: hidden;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .status,
+    .boardRow {
+        height: 35px;
+        line-height: 35px;
+        text-align: center;
+    }
+
+    .game {
+        display: flex;
+    }
+
+    .gameHistory {
+        margin: 40px 0px 0px 100px
+    }
+
+    .gameBoard {
+        margin: 50px 0 0 100px;
+    }
+
+    .historyButton {
+        margin-bottom: 5px;
+        width: 80px;
+    }
