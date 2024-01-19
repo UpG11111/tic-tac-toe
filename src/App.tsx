@@ -33,6 +33,7 @@ function App () {
         dispatch(setGameConfig(GAME_CONFIG[selectedGame]));
         setInputVal(GAME_CONFIG[selectedGame].boardSize);
     };
+
     /**
      * 棋盘大小输入框的值更改事件处理
      * @param e e
