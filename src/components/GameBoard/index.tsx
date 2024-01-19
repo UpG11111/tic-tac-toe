@@ -3,7 +3,7 @@ import GameSquare from './GameSquare/index.tsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/index.ts';
 import { boardChange, setWinner } from '../../store/modules/game.ts';
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 /**
  * 游戏棋盘组件
@@ -18,6 +18,8 @@ const GameBoard: React.FC = () => {
 
     const dispatch = useDispatch();
 
+    // 记录被点击棋盘格下标
+    const [coordinate, setCoordinate] = useState<[number, number]|null>(null);
     const currentBoard: (string | null)[][] = history[history.length - 1];
     /**
      * 获取下一个棋子的位置
@@ -28,14 +30,11 @@ const GameBoard: React.FC = () => {
         return player ? gameConfig.piece[0] : gameConfig.piece[1];
     }
 
-    /**
-     * 处理方块点击事件
-     *
-     * @param {number} row - 被点击的棋盘行索引
-     * @param {number} col - 被点击的棋盘列索引
-     */
-    const handleSquareClick = useCallback((row: number, col: number) => {
-        if (currentBoard[row][col] || winner) {
+    useEffect(() => {
+        if (!coordinate) return;
+        const [row, col] = coordinate;
+        if (currentBoard[row]?.[col] || winner) {
+            setCoordinate(null);
             return;
         }
         // 创建一个新的棋盘状态数组，并设置当前位置为下一步棋子
@@ -49,6 +48,15 @@ const GameBoard: React.FC = () => {
         } else if (nextBoard.every((subArray) => subArray.every((item) => item !== null,))) {
             dispatch(setWinner('平局'));
         }
+        setCoordinate(null);
+    }, [coordinate]);
+    /**
+     * 棋盘格点击函数
+     * @param rowIndex 横向索引
+     * @param colIndex 纵向索引
+     */
+    const handleSquareClick  = useCallback((rowIndex:number, colIndex:number) => {
+        setCoordinate([rowIndex, colIndex]);
     }, []);
 
     // 当前状态信息
@@ -69,7 +77,9 @@ const GameBoard: React.FC = () => {
                             <GameSquare
                                 key={`${rowIndex}-${colIndex}`}
                                 squareValue={currentBoard[rowIndex]?.[colIndex]}
-                                onSquareClick={() => handleSquareClick(rowIndex, colIndex)}
+                                onSquareClick={handleSquareClick}
+                                row={rowIndex}
+                                col={colIndex}
                             />
                         ))}
                     </div>
