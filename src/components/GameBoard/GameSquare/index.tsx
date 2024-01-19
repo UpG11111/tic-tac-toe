@@ -7,7 +7,6 @@ interface GameSquareProps {
 
 class GameSquare extends Component<GameSquareProps> {
     render () {
-        console.log(1);
         return (
             <span className="square" onClick={this.props.onSquareClick}>
                 {this.props.squareValue}
@@ -17,4 +16,3 @@ class GameSquare extends Component<GameSquareProps> {
 }
 
 export default (GameSquare);
-

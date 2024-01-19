@@ -28,9 +28,9 @@ class GameBoard extends Component<AllProps> {
     }
 
     /**
-     * 1
-     * @param player 1
-     * @returns
+     * 获取下一棋子样式
+     * @param player
+     * @returns string
      */
     getNextChess (player: boolean): string {
         return player
@@ -38,7 +38,11 @@ class GameBoard extends Component<AllProps> {
             : this.props.gameConfig.piece[1];
     }
 
-    // eslint-disable-next-line require-jsdoc-except/require-jsdoc
+    /**
+     * 处理方块点击事件的处理函数
+     * @param {number} row - 点击的棋盘行索引
+     * @param {number} col - 点击的棋盘列索引
+    */
     handleSquareClick (row: number, col: number) {
         const {
             dispatchBoardChange,
@@ -104,9 +108,17 @@ class GameBoard extends Component<AllProps> {
         );
     }
 }
+
 /**
- * 1. 通过 connect() 创建一个容器组件，它会接收 state 和 dispatch 作为 props
- * 2. 通过 connect() 创建的容器组件会接收组件的 props，然后通过 mapStateToProps 和 mapDispatchToProps 将 props 传递给组件
+ * 将全局 Redux 状态映射到组件 Props 的函数。
+ *
+ * @param { RootState } state - 应用程序的根状态对象。
+ * @returns { PropsFromState } - 映射后的 Props 对象，包含以下属性：
+ * @returns { number } boardSize - 游戏棋盘大小。
+ * @returns { PlayerType } firstPlayer - 游戏中第一个玩家的类型或标识。
+ * @returns { PlayerType | null } winner - 当前游戏的获胜者，若无则为 null。
+ * @returns { GameConfig } gameConfig - 游戏配置对象。
+ * @returns { HistoryItem[] } history - 游戏历史记录数组。
  */
 const mapStateToProps = (state: RootState): PropsFromState => ({
     boardSize: state.game.boardSize,
@@ -115,13 +127,23 @@ const mapStateToProps = (state: RootState): PropsFromState => ({
     gameConfig: state.game.gameConfig,
     history: state.game.history,
 });
+
 /**
- * 1. 通过 connect() 创建一个容器组件，它会接收 state 和 dispatch 作为 props
- * 2. 通过 connect() 创建的容器组件会接收组件的 props，然后通过 mapStateToProps 和 mapDispatchToProps 将 props 传递给组件
+ * 将action creator映射到dispatch函数上的函数
+ * @param {Dispatch} dispatch - Redux store中的dispatch函数
+ * @returns {Object} - 一个包含dispatch函数的方法对象
  */
 const mapDispatchToProps = (dispatch: Dispatch) => ({
+    /**
+     * 发送boardChange action的函数
+     * @param {(string | null)[][]} nextBoard - 下一个棋盘状态
+     */
     dispatchBoardChange: (nextBoard: (string | null)[][]) =>
         dispatch(boardChange(nextBoard)),
+    /**
+     * 发送setWinner action的函数
+     * @param {string} winner - 胜利者
+     */
     dispatchSetWinner: (winner: string) => dispatch(setWinner(winner)),
 });
 
