@@ -21,6 +21,7 @@ const GameBoard: React.FC = () => {
     // 记录被点击棋盘格下标
     const [coordinate, setCoordinate] = useState<[number, number]|null>(null);
     const currentBoard: (string | null)[][] = history[history.length - 1];
+
     /**
      * 获取下一个棋子的位置
      * @param player 当前玩家标识，true表示玩家1，false表示玩家2
