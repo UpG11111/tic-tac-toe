@@ -1,15 +1,18 @@
-import { Component } from 'react';
+import { PureComponent } from 'react';
 
 interface GameSquareProps {
     squareValue: string | null;
-    onSquareClick: () => void;
+    onSquareClick: Function;
+    row:number;
+    col:number;
 }
 
-class GameSquare extends Component<GameSquareProps> {
+class GameSquare extends PureComponent<GameSquareProps> {
     render () {
+        const { squareValue, onSquareClick, row, col } = this.props;
         return (
-            <span className="square" onClick={this.props.onSquareClick}>
-                {this.props.squareValue}
+            <span className="square" onClick={() => onSquareClick(row, col)}>
+                {squareValue}
             </span>
         );
     }

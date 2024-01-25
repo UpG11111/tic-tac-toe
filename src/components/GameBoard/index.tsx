@@ -1,30 +1,51 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import isWin from '../../utils/isWin.ts';
-import GameSquare from './GameSquare/index.tsx';
+import isWin from '../../utils/isWin';
+import GameSquare from './GameSquare';
 import { RootState } from '../../store/index';
 import { Dispatch } from 'redux';
-import { boardChange, setWinner } from '../../store/modules/game.ts';
-
+import { boardChange, setWinner } from '../../store/modules/game';
+import nextStep from '../../utils/nextStep';
 interface PropsFromState {
     boardSize: number;
     firstPlayer: boolean;
     winner: string | null;
-    gameConfig: any; // 根据实际类型填充此处
+    gameConfig: any;
     history: (string | null)[][][];
 }
 
-type DispatchProps = {
+interface DispatchProps  {
     dispatchBoardChange: (nextBoard: (string | null)[][]) => void;
     dispatchSetWinner: (winner: string) => void;
 }
 
-type AllProps = PropsFromState & DispatchProps
+interface GameBoardProps {
+    aiBattle:string|null;
+}
+
+type AllProps = PropsFromState & DispatchProps & GameBoardProps;
 
 class GameBoard extends Component<AllProps> {
     constructor (props: AllProps) {
         super(props);
         this.handleSquareClick = this.handleSquareClick.bind(this);
+        this.handleAIPlacement = this.handleAIPlacement.bind(this);
+    }
+
+    /**
+     * 组件更新后调用生命周期更新数据，AI先手下第一个棋
+     */
+    componentDidUpdate (): void {
+        const { aiBattle, history, firstPlayer } = this.props;
+        if (aiBattle === 'first' && firstPlayer) {
+            const aiNextStep = nextStep(history[history.length - 1].map((boardRow) => [
+                ...boardRow.map((cell) => cell),
+            ]), firstPlayer);
+            if (aiNextStep) {
+                const { xAxis, yAxis } = aiNextStep;
+                setTimeout(() => this.handleSquareClick(yAxis, xAxis), 500);
+            }
+        }
     }
 
     /**
@@ -55,20 +76,35 @@ class GameBoard extends Component<AllProps> {
         if (history[history.length - 1][row]?.[col] || this.props.winner) {
             return;
         }
-
         const nextBoard = history[history.length - 1].map((boardRow) => [
-            ...boardRow,
+            ...boardRow.map((cell) => cell),
         ]);
         const nextChess = this.getNextChess(firstPlayer);
         nextBoard[row][col] = nextChess;
 
         dispatchBoardChange(nextBoard);
+
         if (isWin(nextBoard, [row, col], nextChess, gameConfig.winCount)) {
             dispatchSetWinner(`${nextChess}获胜`);
         } else if (
             nextBoard.every((subArray) => subArray.every((item) => item !== null))
         ) {
             dispatchSetWinner('平局');
+        }
+        this.handleAIPlacement(nextBoard);
+    }
+
+    /**
+     * AI下棋
+     */
+    handleAIPlacement (nextBoard: (string | null)[][]) {
+        const { aiBattle, firstPlayer } = this.props;
+        if (aiBattle === 'second' && firstPlayer) {
+            const aiNextStep = nextStep(JSON.parse(JSON.stringify(nextBoard)), !firstPlayer);
+            if (aiNextStep) {
+                const { xAxis, yAxis } = aiNextStep;
+                setTimeout(() => this.handleSquareClick(yAxis, xAxis), 500);
+            }
         }
     }
 
@@ -91,8 +127,10 @@ class GameBoard extends Component<AllProps> {
                 {Array.from({ length: boardSize }, (__, colIndex) => (
                     <GameSquare
                         key={`${rowIndex}-${colIndex}`}
+                        row={rowIndex}
+                        col={colIndex}
                         squareValue={history[history.length - 1][rowIndex]?.[colIndex]}
-                        onSquareClick={() => this.handleSquareClick(rowIndex, colIndex)}
+                        onSquareClick={this.handleSquareClick}
                     />
                 ))}
             </div>
