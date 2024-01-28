@@ -14,7 +14,7 @@ interface PropsFromState {
     history: (string | null)[][][];
 }
 
-interface DispatchProps  {
+interface DispatchProps {
     dispatchBoardChange: (nextBoard: (string | null)[][]) => void;
     dispatchSetWinner: (winner: string) => void;
 }
@@ -35,7 +35,7 @@ class GameBoard extends Component<AllProps> {
     /**
      * 组件更新后调用生命周期更新数据，AI先手下第一个棋
      */
-    componentDidUpdate (): void {
+    componentDidUpdate () {
         const { aiBattle, history, firstPlayer } = this.props;
         if (aiBattle === 'first' && firstPlayer) {
             const aiNextStep = nextStep(history[history.length - 1].map((boardRow) => [
@@ -43,7 +43,9 @@ class GameBoard extends Component<AllProps> {
             ]), firstPlayer);
             if (aiNextStep) {
                 const { xAxis, yAxis } = aiNextStep;
-                setTimeout(() => this.handleSquareClick(yAxis, xAxis), 500);
+                setTimeout(() => {
+                    this.handleSquareClick(yAxis, xAxis);
+                }, 0);
             }
         }
     }
@@ -69,11 +71,12 @@ class GameBoard extends Component<AllProps> {
             dispatchBoardChange,
             dispatchSetWinner,
             firstPlayer,
+            winner,
             history,
             gameConfig,
         } = this.props;
 
-        if (history[history.length - 1][row]?.[col] || this.props.winner) {
+        if (history[history.length - 1][row]?.[col] || winner) {
             return;
         }
         const nextBoard = history[history.length - 1].map((boardRow) => [
@@ -103,7 +106,9 @@ class GameBoard extends Component<AllProps> {
             const aiNextStep = nextStep(JSON.parse(JSON.stringify(nextBoard)), !firstPlayer);
             if (aiNextStep) {
                 const { xAxis, yAxis } = aiNextStep;
-                setTimeout(() => this.handleSquareClick(yAxis, xAxis), 500);
+                setTimeout(() => {
+                    this.handleSquareClick(yAxis, xAxis);
+                }, 0);
             }
         }
     }

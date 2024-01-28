@@ -1,6 +1,13 @@
 import { initialGameState } from '../constants/gameConstants';
+import  isWin from './isWin';
 
-const { piece } = initialGameState;
+/** 最小得分 */
+const MIN_SCORE = -Infinity;
+/** 最大得分 */
+const MAX_SCORE = Infinity;
+/** 平局得分 */
+const TIED_SCORE = 0;
+const { piece, winCount } = initialGameState;
 const [xPiece, oPiece] = piece;
 /**
  * 获取最佳移动
@@ -8,7 +15,7 @@ const [xPiece, oPiece] = piece;
  * @returns 最佳移动的位置对象{x, y}
  */
 export default function getBestMove (board: (string | null)[][], firstPlayer:boolean) {
-    const bestMove = alphaBeta(board, -Infinity, Infinity, firstPlayer);
+    const bestMove = alphaBeta(board, MIN_SCORE, MAX_SCORE, firstPlayer);
     return { xAxis: bestMove.xAxis, yAxis: bestMove.yAxis };
 }
 
@@ -25,20 +32,26 @@ function alphaBeta (
     alpha: number,
     beta: number,
     maximizingPlayer: boolean,
+    lastMove: [ number, number ] = [-1, -1],
 ): { score: number, xAxis: number, yAxis: number } {
     const emptyCells = getEmptyCells(board);
-    if (isWin(board, xPiece) || isWin(board, oPiece) || emptyCells.length === 0) {
-        const score = evaluate(board);
-        return { score, xAxis: -1, yAxis: -1 }; // 返回评估分数，坐标设置为无效值-1
+    const pieceStyle = maximizingPlayer ? oPiece : xPiece;
+    const winner = isWin(board, lastMove, pieceStyle, winCount);
+    let score;
+    if (winner) {
+        score = pieceStyle === xPiece ? MAX_SCORE : MIN_SCORE;
+        return { score, xAxis: -1, yAxis: -1 };
+    } else if (emptyCells.length === 0) {
+        score = TIED_SCORE;
+        return { score, xAxis: -1, yAxis: -1 };
     }
     let bestMove = maximizingPlayer
-        ? { score: -Infinity, xAxis: 0, yAxis: 0 }
-        : { score: Infinity, xAxis: 0, yAxis: 0 };
-
+        ? { score: MIN_SCORE, xAxis: 0, yAxis: 0 }
+        : { score: MAX_SCORE, xAxis: 0, yAxis: 0 };
     for (let index = 0; index < emptyCells.length; index++) {
         const { xAxis, yAxis } = emptyCells[index];
         board[yAxis][xAxis] = maximizingPlayer ? xPiece : oPiece;
-        const move = alphaBeta(board, alpha, beta, !maximizingPlayer);
+        const move = alphaBeta(board, alpha, beta, !maximizingPlayer, [yAxis, xAxis]);
         board[yAxis][xAxis] = null;
         move.xAxis = xAxis;
         move.yAxis = yAxis;
@@ -58,6 +71,7 @@ function alphaBeta (
             break;
         }
     }
+
     return bestMove;
 }
 
@@ -76,46 +90,4 @@ function getEmptyCells (board: (string | null)[][]) {
         }
     }
     return emptyCells;
-}
-
-/**
- * 评估棋盘状态并返回得分
- * @param board 游戏棋盘
- * @returns 得分
- */
-function evaluate (board: (string | null)[][]): number {
-    if (isWin(board, xPiece)) {
-        return Infinity;
-    } else if (isWin(board, oPiece)) {
-        return -Infinity;
-    }
-    return 0;
-}
-
-/**
- * 判断是否获胜
- * @param board 游戏棋盘
- * @param pieceStyle 棋子样式
- * @returns 是否获胜
- */
-function isWin (board: (string | null)[][], pieceStyle: string) {
-    const borderSize = board.length;
-    let winner: string | null = null;
-    // 所有需要检查的路径
-    const winState = [
-        ...board,
-        ...board.map((__, rowIndex) => board.map(row => row[rowIndex])),
-        [...Array(borderSize).keys()].map(index => board[index][index]),
-        [...Array(borderSize).keys()].map(index => board[index][borderSize - 1 - index]),
-    ];
-
-    // 检查是否有胜利路径
-    winState.some(path => {
-        if (path.every(cell => cell === pieceStyle)) {
-            winner = pieceStyle;
-            return true; // 找到胜利者后提前结束循环
-        }
-        return false;
-    });
-    return winner;
 }
