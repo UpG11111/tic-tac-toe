@@ -19,6 +19,7 @@ interface DispatchProps {
     dispatchSetWinner: (winner: string) => void;
 }
 
+
 interface GameBoardProps {
     aiBattle:string|null;
 }
@@ -35,7 +36,7 @@ class GameBoard extends Component<AllProps> {
     /**
      * 组件更新后调用生命周期更新数据，AI先手下第一个棋
      */
-    componentDidUpdate () {
+    componentDidUpdate ():void {
         const { aiBattle, history, firstPlayer } = this.props;
         if (aiBattle === 'first' && firstPlayer) {
             const aiNextStep = nextStep(history[history.length - 1].map((boardRow) => [
@@ -44,8 +45,8 @@ class GameBoard extends Component<AllProps> {
             if (aiNextStep) {
                 const { xAxis, yAxis } = aiNextStep;
                 setTimeout(() => {
-                    this.handleSquareClick(yAxis, xAxis);
-                }, 0);
+                    this.handleSquareClick(yAxis, xAxis, true);
+                }, 1000);
             }
         }
     }
@@ -66,7 +67,7 @@ class GameBoard extends Component<AllProps> {
      * @param {number} row - 点击的棋盘行索引
      * @param {number} col - 点击的棋盘列索引
     */
-    handleSquareClick (row: number, col: number) {
+    handleSquareClick (row: number, col: number, isAI: boolean) {
         const {
             dispatchBoardChange,
             dispatchSetWinner,
@@ -74,8 +75,10 @@ class GameBoard extends Component<AllProps> {
             winner,
             history,
             gameConfig,
+            aiBattle,
         } = this.props;
-
+        if (aiBattle === 'first' && firstPlayer && !isAI) return;
+        if (aiBattle === 'second' && !firstPlayer && !isAI) return;
         if (history[history.length - 1][row]?.[col] || winner) {
             return;
         }
@@ -107,8 +110,8 @@ class GameBoard extends Component<AllProps> {
             if (aiNextStep) {
                 const { xAxis, yAxis } = aiNextStep;
                 setTimeout(() => {
-                    this.handleSquareClick(yAxis, xAxis);
-                }, 0);
+                    this.handleSquareClick(yAxis, xAxis, true);
+                }, 1000);
             }
         }
     }
@@ -134,6 +137,7 @@ class GameBoard extends Component<AllProps> {
                         key={`${rowIndex}-${colIndex}`}
                         row={rowIndex}
                         col={colIndex}
+                        isAI={false}
                         squareValue={history[history.length - 1][rowIndex]?.[colIndex]}
                         onSquareClick={this.handleSquareClick}
                     />
