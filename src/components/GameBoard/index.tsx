@@ -46,7 +46,7 @@ class GameBoard extends Component<AllProps> {
                 const { xAxis, yAxis } = aiNextStep;
                 setTimeout(() => {
                     this.handleSquareClick(yAxis, xAxis, true);
-                }, 1000);
+                }, 500);
             }
         }
     }
@@ -66,6 +66,7 @@ class GameBoard extends Component<AllProps> {
      * 处理方块点击事件的处理函数
      * @param {number} row - 点击的棋盘行索引
      * @param {number} col - 点击的棋盘列索引
+     * @param {boolean} isAI - 是否是AI下棋
     */
     handleSquareClick (row: number, col: number, isAI: boolean) {
         const {
@@ -102,6 +103,7 @@ class GameBoard extends Component<AllProps> {
 
     /**
      * AI下棋
+     * @param {Array} nextBoard - 下一步棋盘
      */
     handleAIPlacement (nextBoard: (string | null)[][]) {
         const { aiBattle, firstPlayer } = this.props;
@@ -111,7 +113,7 @@ class GameBoard extends Component<AllProps> {
                 const { xAxis, yAxis } = aiNextStep;
                 setTimeout(() => {
                     this.handleSquareClick(yAxis, xAxis, true);
-                }, 1000);
+                }, 500);
             }
         }
     }
