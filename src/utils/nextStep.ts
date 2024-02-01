@@ -1,5 +1,5 @@
 import { initialGameState } from '../constants/gameConstants';
-import  isWin from './isWin';
+import isWin from './isWin';
 
 /** 最小得分 */
 const MIN_SCORE = -Infinity;
@@ -14,7 +14,7 @@ const [xPiece, oPiece] = piece;
  * @param board 游戏棋盘
  * @returns 最佳移动的位置对象{x, y}
  */
-export default function getBestMove (board: (string | null)[][], firstPlayer:boolean) {
+export default function getBestMove (board: (string | null)[][], firstPlayer: boolean) {
     const bestMove = alphaBeta(board, MIN_SCORE, MAX_SCORE, firstPlayer);
     return { xAxis: bestMove.xAxis, yAxis: bestMove.yAxis };
 }
@@ -32,7 +32,7 @@ function alphaBeta (
     alpha: number,
     beta: number,
     maximizingPlayer: boolean,
-    lastMove: [ number, number ] = [-1, -1],
+    lastMove: [number, number] = [-1, -1],
 ): { score: number, xAxis: number, yAxis: number } {
     const emptyCells = getEmptyCells(board);
     const pieceStyle = maximizingPlayer ? oPiece : xPiece;
@@ -46,8 +46,8 @@ function alphaBeta (
         return { score, xAxis: -1, yAxis: -1 };
     }
     let bestMove = maximizingPlayer
-        ? { score: MIN_SCORE, xAxis: 0, yAxis: 0 }
-        : { score: MAX_SCORE, xAxis: 0, yAxis: 0 };
+        ? { score: MIN_SCORE, xAxis: -1, yAxis: -1 }
+        : { score: MAX_SCORE, xAxis: -1, yAxis: -1 };
     for (let index = 0; index < emptyCells.length; index++) {
         const { xAxis, yAxis } = emptyCells[index];
         board[yAxis][xAxis] = maximizingPlayer ? xPiece : oPiece;

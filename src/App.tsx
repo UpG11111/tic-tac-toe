@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    setWinner,
     setBoardSize,
-    setFirstPlayer,
     setGameConfig,
-    setHistory,
 } from './store/modules/game';
 import { Dispatch } from 'redux';
 import { RootState } from './store/index';
@@ -22,7 +19,6 @@ type GameOption = keyof typeof GAME_CONFIG
 
 interface State {
     inputVal: number | string;
-    aiBattle: 'first' | 'second' |null;
     selectedGame: GameOption;
 }
 
@@ -35,11 +31,8 @@ interface PropsFromState {
 }
 
 interface PropsFromDispatch {
-    dispatchSetWinner: (winner: string | null) => void;
     dispatchSetBoardSize: (size: number) => void;
-    dispatchSetFirstPlayer: (player: boolean) => void;
-    dispatchSetGameConfig: (config: any) => void; // 根据实际类型填充此处
-    dispatchSetHistory: (history: (string | null)[][][]) => void;
+    dispatchSetGameConfig: (config: any) => void;
 }
 
 type AppProps = PropsFromState & PropsFromDispatch
@@ -49,7 +42,6 @@ class App extends Component<AppProps, State> {
         super(props);
         this.state = {
             inputVal: props.boardSize,
-            aiBattle: null,
             selectedGame: Object.keys(GAME_CONFIG)[0] as GameOption,
         };
     }
@@ -63,7 +55,6 @@ class App extends Component<AppProps, State> {
         this.setState({ selectedGame });
         this.props.dispatchSetGameConfig(GAME_CONFIG[selectedGame]);
         this.setState({ inputVal: GAME_CONFIG[selectedGame].boardSize });
-        this.setState({ aiBattle: null });
     }
 
     /**
@@ -75,59 +66,9 @@ class App extends Component<AppProps, State> {
         if (inputValue >= MIN_BOARD_SIZE && inputValue <= MAX_BOARD_SIZE) {
             this.props.dispatchSetBoardSize(inputValue);
             this.setState({ inputVal: inputValue });
-            this.setState({ aiBattle: null });
         } else {
             this.setState({ inputVal: this.props.boardSize });
         }
-    }
-
-    /**
-     * 跳转到指定索引位置
-     * @param index 回退记录的索引
-     */
-    jumpTo = (index: number): void => {
-        this.props.dispatchSetFirstPlayer(index % 2 === 0);
-        this.props.dispatchSetHistory([...this.props.history.slice(0, index + 1)]);
-        if (index < this.props.history.length - 1) {
-            this.props.dispatchSetWinner(null);
-        }
-    }
-
-    /**
-     * AI对战先手点击事件
-     */
-    aiFirstClick () {
-        this.setState({ aiBattle: 'first', selectedGame: 'TIC_TAC_TOE' });
-        this.props.dispatchSetGameConfig(GAME_CONFIG.TIC_TAC_TOE);
-        this.setState({ inputVal: GAME_CONFIG.TIC_TAC_TOE.boardSize });
-    }
-
-    /**
-     * AI对战后手点击事件
-     */
-    aiSecond () {
-        this.setState({ aiBattle: 'second', selectedGame: 'TIC_TAC_TOE' });
-        this.props.dispatchSetGameConfig(GAME_CONFIG.TIC_TAC_TOE);
-        this.setState({ inputVal: GAME_CONFIG.TIC_TAC_TOE.boardSize });
-    }
-
-    // 历史记录表
-    renderMoves () {
-        return this.props.history.map((__, index) => {
-            let description: string;
-            if (index) {
-                description = `第${index}步`;
-            } else {
-                description = '重新开始';
-            }
-            return (
-                <li key={index}>
-                    <button onClick={() => this.jumpTo(index)} className="historyButton">
-                        {description}
-                    </button>
-                </li>
-            );
-        });
     }
 
     render () {
@@ -143,8 +84,6 @@ class App extends Component<AppProps, State> {
                             </option>
                         ))}
                     </select>
-                    <button onClick={() => this.aiFirstClick()}>AI对战(AI先手)</button>
-                    <button onClick={() => this.aiSecond()}>AI对战(AI后手)</button>
                     {/* 棋盘大小输入框 */}
                     <div className="gameHistory">
                         棋盘大小：
@@ -158,13 +97,12 @@ class App extends Component<AppProps, State> {
                             min={MIN_BOARD_SIZE}
                             max={MAX_BOARD_SIZE}
                         />
-                        <ol>{this.renderMoves()}</ol>
                     </div>
                 </div>
 
                 {/* 游戏棋盘 */}
                 <div className="gameBoard">
-                    <GameBoard aiBattle={this.state.aiBattle} />
+                    <GameBoard />
                 </div>
             </div>
         );
@@ -188,12 +126,8 @@ const mapStateToProps = (state: RootState): PropsFromState => ({
  * @returns {PropsFromDispatch}
  */
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    dispatchSetWinner: (winner: string|null) => dispatch(setWinner(winner)),
     dispatchSetBoardSize: (size: number) => dispatch(setBoardSize(size)),
-    dispatchSetFirstPlayer: (player: boolean) => dispatch(setFirstPlayer(player)),
     dispatchSetGameConfig: (config: any) => dispatch(setGameConfig(config)),
-    dispatchSetHistory: (history: (string | null)[][][]) =>
-        dispatch(setHistory(history)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

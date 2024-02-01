@@ -5,14 +5,13 @@ interface GameSquareProps {
     onSquareClick: Function;
     row:number;
     col:number;
-    isAI:boolean;
 }
 
 class GameSquare extends PureComponent<GameSquareProps> {
     render () {
-        const { squareValue, onSquareClick, row, col, isAI } = this.props;
+        const { squareValue, onSquareClick, row, col } = this.props;
         return (
-            <span className="square" onClick={() => onSquareClick(row, col, isAI)}>
+            <span className="square" onClick={() => onSquareClick(row, col)}>
                 {squareValue}
             </span>
         );
