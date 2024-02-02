@@ -2,20 +2,24 @@ import { initialGameState } from '../constants/gameConstants';
 import isWin from './isWin';
 
 /** 最小得分 */
-const MIN_SCORE = -Infinity;
+const MIN_SCORE = -10;
 /** 最大得分 */
-const MAX_SCORE = Infinity;
+const MAX_SCORE = 10;
 /** 平局得分 */
 const TIED_SCORE = 0;
 const { piece, winCount } = initialGameState;
 const [xPiece, oPiece] = piece;
+
 /**
  * 获取最佳移动
  * @param board 游戏棋盘
  * @returns 最佳移动的位置对象{x, y}
  */
 export default function getBestMove (board: (string | null)[][], firstPlayer: boolean) {
-    const bestMove = alphaBeta(board, MIN_SCORE, MAX_SCORE, firstPlayer);
+    if (getEmptyCells(board).length === (board.length ** 2)  && firstPlayer) {
+        return { xAxis: 0, yAxis: 0 };
+    }
+    const bestMove = alphaBeta(board, MIN_SCORE, MAX_SCORE, firstPlayer, 0);
     return { xAxis: bestMove.xAxis, yAxis: bestMove.yAxis };
 }
 
@@ -25,6 +29,7 @@ export default function getBestMove (board: (string | null)[][], firstPlayer: bo
  * @param alpha Alpha值，当前搜索路径的最大得分下限
  * @param beta Beta值，当前搜索路径的最小得分上限
  * @param maximizingPlayer 是否为最大化玩家
+ * @param steps 当前递归层级，表示走过的步数
  * @returns 包含得分和落子位置的对象
  */
 function alphaBeta (
@@ -32,6 +37,7 @@ function alphaBeta (
     alpha: number,
     beta: number,
     maximizingPlayer: boolean,
+    steps: number,
     lastMove: [number, number] = [-1, -1],
 ): { score: number, xAxis: number, yAxis: number } {
     const emptyCells = getEmptyCells(board);
@@ -39,19 +45,19 @@ function alphaBeta (
     const winner = isWin(board, lastMove, pieceStyle, winCount);
     let score;
     if (winner) {
-        score = pieceStyle === xPiece ? MAX_SCORE : MIN_SCORE;
-        return { score, xAxis: -1, yAxis: -1 };
+        score = pieceStyle === xPiece ? MAX_SCORE - steps : MIN_SCORE + steps;
+        return { score, xAxis: 0, yAxis: 0 };
     } else if (emptyCells.length === 0) {
         score = TIED_SCORE;
-        return { score, xAxis: -1, yAxis: -1 };
+        return { score, xAxis: 0, yAxis: 0 };
     }
     let bestMove = maximizingPlayer
-        ? { score: MIN_SCORE, xAxis: -1, yAxis: -1 }
-        : { score: MAX_SCORE, xAxis: -1, yAxis: -1 };
+        ? { score: MIN_SCORE - steps, xAxis: 0, yAxis: 0 }
+        : { score: MAX_SCORE + steps, xAxis: 0, yAxis: 0 };
     for (let index = 0; index < emptyCells.length; index++) {
         const { xAxis, yAxis } = emptyCells[index];
         board[yAxis][xAxis] = maximizingPlayer ? xPiece : oPiece;
-        const move = alphaBeta(board, alpha, beta, !maximizingPlayer, [yAxis, xAxis]);
+        const move = alphaBeta(board, alpha, beta, !maximizingPlayer, steps + 1, [yAxis, xAxis]);
         board[yAxis][xAxis] = null;
         move.xAxis = xAxis;
         move.yAxis = yAxis;

@@ -179,17 +179,15 @@ class GameBoard extends Component<AllProps, State> {
     jumpTo = (index: number): void => {
         this.props.dispatchSetFirstPlayer(index % 2 === 0);
         this.props.dispatchSetHistory([...this.props.history.slice(0, index + 1)]);
+        clearTimeout(this.state.timer as NodeJS.Timeout);
         if (index < this.props.history.length - 1) {
             this.props.dispatchSetWinner(null);
         }
+        this.setState({ currentPlayer: index % 2 === 0 ? 'playerOne' : 'playerTwo' });
         if (index % 2 === 0 && this.state.aiBattle === 'first') {
-            this.setState({ currentPlayer: 'playerOne' });
-            clearTimeout(this.state.timer as NodeJS.Timeout);
             this.handleAIPlacement();
         }
         if (index % 2 === 1 && this.state.aiBattle === 'second') {
-            this.setState({ currentPlayer: 'playerTwo' });
-            clearTimeout(this.state.timer as NodeJS.Timeout);
             this.handleAIPlacement();
         }
     }
