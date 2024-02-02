@@ -65,8 +65,7 @@ class GameBoard extends Component<AllProps, State> {
             // ai落子
             if (currentPlayer === 'playerOne' && isAi) {
                 this.handleSquareClick(row, col);
-                this.setState({ currentPlayer: 'playerTwo' });
-                this.setState({ isAi: false });
+                this.setState({ isAi: false, currentPlayer: 'playerTwo' });
             }
             // 玩家落子，且调用ai
             if (currentPlayer === 'playerTwo' && !isAi) {
@@ -86,8 +85,7 @@ class GameBoard extends Component<AllProps, State> {
             // ai落子
             if (currentPlayer === 'playerTwo' && isAi) {
                 this.handleSquareClick(row, col);
-                this.setState({ isAi: false });
-                this.setState({ currentPlayer: 'playerOne' });
+                this.setState({ isAi: false, currentPlayer: 'playerOne' });
             }
         }
         // 无ai模式
@@ -155,14 +153,21 @@ class GameBoard extends Component<AllProps, State> {
         this.setState({ timer: timeout });
     }
 
+    /**
+     * AI先手模式
+     */
     aiFirstMode = () => {
         this.props.dispatchSetGameConfig(GAME_CONFIG.TIC_TAC_TOE);
         this.setState({ aiBattle: 'first', currentPlayer: 'playerOne', isAi: false });
         this.handleAIPlacement();
     }
 
+    /**
+     * AI后手模式
+     */
     aiSecondMode = () => {
         this.props.dispatchSetGameConfig(GAME_CONFIG.TIC_TAC_TOE);
+        clearTimeout(this.state.timer as NodeJS.Timeout);
         this.setState({ aiBattle: 'second', isAi: false, currentPlayer: 'playerOne' });
         this.setState({ currentPlayer: 'playerOne' });
     }

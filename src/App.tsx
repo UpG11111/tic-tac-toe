@@ -36,7 +36,7 @@ interface PropsFromDispatch {
     dispatchSetWinner: (winner: string | null) => void;
     dispatchSetBoardSize: (size: number) => void;
     dispatchSetFirstPlayer: (player: boolean) => void;
-    dispatchSetGameConfig: (config: any) => void; // 根据实际类型填充此处
+    dispatchSetGameConfig: (config: any) => void;
 }
 
 type AppProps = PropsFromState & PropsFromDispatch
