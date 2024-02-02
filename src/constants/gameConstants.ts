@@ -7,14 +7,14 @@ export const MAX_BOARD_SIZE: number = 19;
 export const GAME_CONFIG = {
     /** 井字棋 */
     TIC_TAC_TOE: {
-        gameName: 'Tic Tac Toe',
+        gameName: 'TIC_TAC_TOE',
         boardSize: 3,
         piece: ['X', 'O'],
         winCount: 3,
     },
     /** 五子棋 */
     GOBANG: {
-        gameName: 'Gobang',
+        gameName: 'GOBANG',
         boardSize: 19,
         piece: ['⚫', '⚪'],
         winCount: 5,

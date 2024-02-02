@@ -14,8 +14,6 @@ interface InitialState {
     boardSize: number;
     gameConfig: GameConfig;
     history: (string | null)[][][];
-    playerOne: string;
-    playerTwo: string;
 }
 
 const initialState: InitialState = {
@@ -28,8 +26,7 @@ const initialState: InitialState = {
             .fill(null)
             .map(() => Array(initialGameState.boardSize).fill(null)),
     ],
-    playerOne: 'PLAYER',
-    playerTwo: 'PLAYER',
+
 };
 const gameStore = createSlice({
     name: 'game',
@@ -101,22 +98,6 @@ const gameStore = createSlice({
             // 切换下一位玩家
             state.firstPlayer = !state.firstPlayer;
         },
-        /**
-     * 设置玩家一
-     * @param state 状态对象
-     * @param action PayloadAction实例，包含玩家一的名字
-     */
-        setPlayerOne (state, action: PayloadAction<string>) {
-            state.playerOne = action.payload;
-        },
-        /**
-     * 设置玩家一
-     * @param state 状态对象
-     * @param action PayloadAction实例，包含玩家二的名字
-     */
-        setPlayerTwo (state, action: PayloadAction<string>) {
-            state.playerTwo = action.payload;
-        },
     },
 });
 
@@ -128,6 +109,4 @@ export const {
     setBoardSize,
     setHistory,
     boardChange,
-    setPlayerOne,
-    setPlayerTwo,
 } = gameStore.actions;

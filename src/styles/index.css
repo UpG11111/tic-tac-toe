@@ -8,10 +8,10 @@
         list-style-type: none;
     }
 
-    input {
-        height: 30px;
-        width: 80px;
-        margin-bottom: 30px;
+    .sizeInput input {
+        height: 20px;
+        width: 90px;
+        margin-top: 25px;
     }
 
     .square {
@@ -25,26 +25,41 @@
         font-weight: bold;
     }
 
-    .status,
     .boardRow {
         height: 35px;
         line-height: 35px;
         text-align: center;
     }
 
+    .gameInfo{
+        margin-top: 30px;
+        margin-left: 30px;
+    }
+
     .game {
         display: flex;
     }
 
-    .gameHistory {
-        margin: 40px 0px 0px 100px
-    }
-
-    .gameBoard {
-        margin: 50px 0 0 100px;
+    .historyList {
+        float: right;
+        margin: 30px 0px 0px 50px
     }
 
     .historyButton {
-        margin-bottom: 5px;
-        width: 80px;
+        margin-bottom: 10px;
+        width: 100px;
+    }
+
+    .gameBoard {
+        display: flex;
+    }
+
+    .status {
+        height: 150px;
+        line-height: 40px;
+        text-align: center;
+    }
+
+    .board {
+        margin-left: 50px;
     }

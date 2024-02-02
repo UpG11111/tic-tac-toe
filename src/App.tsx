@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
+    setWinner,
     setBoardSize,
+    setFirstPlayer,
     setGameConfig,
 } from './store/modules/game';
 import { Dispatch } from 'redux';
@@ -31,8 +33,10 @@ interface PropsFromState {
 }
 
 interface PropsFromDispatch {
+    dispatchSetWinner: (winner: string | null) => void;
     dispatchSetBoardSize: (size: number) => void;
-    dispatchSetGameConfig: (config: any) => void;
+    dispatchSetFirstPlayer: (player: boolean) => void;
+    dispatchSetGameConfig: (config: any) => void; // 根据实际类型填充此处
 }
 
 type AppProps = PropsFromState & PropsFromDispatch
@@ -44,6 +48,16 @@ class App extends Component<AppProps, State> {
             inputVal: props.boardSize,
             selectedGame: Object.keys(GAME_CONFIG)[0] as GameOption,
         };
+    }
+
+    /**
+     *组件更新时调用
+     * @param prevProps - 上次组件的props。
+     */
+    componentDidUpdate (prevProps: AppProps) {
+        if (prevProps !== this.props) {
+            this.setState({ inputVal: this.props.boardSize, selectedGame: this.props.gameConfig.gameName });
+        }
     }
 
     /**
@@ -74,9 +88,9 @@ class App extends Component<AppProps, State> {
     render () {
         return (
             <div className="game">
-                <div>
+                <div className='gameInfo'>
                     {/* 游戏选项 */}
-                    <label htmlFor="gameSelect">游戏类型:</label>
+                    <label htmlFor="gameSelect">游戏类型：</label>
                     <select id="gameSelect" value={this.state.selectedGame} onChange={this.handleGameChange}>
                         {Object.keys(GAME_CONFIG).map((item, index) => (
                             <option key={index} value={item}>
@@ -85,7 +99,7 @@ class App extends Component<AppProps, State> {
                         ))}
                     </select>
                     {/* 棋盘大小输入框 */}
-                    <div className="gameHistory">
+                    <div className="sizeInput">
                         棋盘大小：
                         <input
                             type="number"
@@ -125,8 +139,10 @@ const mapStateToProps = (state: RootState): PropsFromState => ({
  * @param dispatch {Dispatch}
  * @returns {PropsFromDispatch}
  */
-const mapDispatchToProps = (dispatch: Dispatch) => ({
+const mapDispatchToProps = (dispatch: Dispatch): PropsFromDispatch => ({
+    dispatchSetWinner: (winner: string | null) => dispatch(setWinner(winner)),
     dispatchSetBoardSize: (size: number) => dispatch(setBoardSize(size)),
+    dispatchSetFirstPlayer: (player: boolean) => dispatch(setFirstPlayer(player)),
     dispatchSetGameConfig: (config: any) => dispatch(setGameConfig(config)),
 });
 
